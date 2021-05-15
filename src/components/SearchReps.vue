@@ -1,3 +1,4 @@
+// PARENT
 <template lang="html">
     <section class="search-reps">
         <v-row>
@@ -21,18 +22,12 @@
                     </v-card-text>
                 </v-card>
 
-                <div id="government-contact-info" v-show="hasContent">
+                <div id="reprenstatives-list" v-show="hasContent">
                     <div>
                         <v-card
-                            class="mb-2 cards elevate"
                             v-for="member in congressMembers"
                             :key="member.name"
-                            :title="member.name"
-                            :sub-title="member.title"
-                            :img-src="member.photoUrl"
-                            img-alt="Image"
-                            img-top
-                            tag="article"
+                            v-on:click="repSelected()"
                         >
                             <v-card-title v-text="member.name"></v-card-title>
                             <v-card-subtitle
@@ -49,7 +44,11 @@
                     </div>
                 </div>
             </v-col>
-            <v-col cols="6"><letter-display></letter-display></v-col>
+            <v-col cols="6"
+                >//LETTER DISPLAY CHILD HERE<letter-display
+                    :congressMembers="congressMembers"
+                ></letter-display
+            ></v-col>
         </v-row>
     </section>
 </template>
@@ -71,7 +70,7 @@ import axios from 'axios';
       return {
           congressMembers:[],
 	      hasContent: false,
-          search: "",
+          search: ""
       }
     },
     methods: {
@@ -88,11 +87,16 @@ import axios from 'axios';
                 'https://murmuring-headland-63935.herokuapp.com/api/amplify/' + this.search
             );
             this.congressMembers = res.data;
+            this.hasContent=true;
+            console.log(res.data);
         } catch (e) {
             console.error(e);
         }
+    },
+    repSelected(){
+        console.log("clicked");
     }
-    }
+}
 }
 </script>
 
