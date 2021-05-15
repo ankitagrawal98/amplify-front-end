@@ -7,22 +7,47 @@
                         <v-subheader class="pa-0">
                             Where do you live?
                         </v-subheader>
-                        <v-form ref="form" lazy-validation>
+                        <v-form ref="form">
                             <v-text-field
-                                :counter="10"
                                 label="Postal Code"
                                 required
                                 v-on:keyup="CheckInputContent"
+                                v-model="search"
                             ></v-text-field>
                         </v-form>
-                        <v-btn
-                            v-model="search"
-                            v-on:click="CreateRepList()"
-                            clickclass="mr-4"
-                            >Submit</v-btn
-                        >
+                        <v-btn v-on:click="CreateRepList()" clickclass="mr-4"
+                            >Submit
+                        </v-btn>
                     </v-card-text>
                 </v-card>
+
+                <div id="government-contact-info" v-show="hasContent">
+                    <div>
+                        <v-card
+                            class="mb-2 cards elevate"
+                            v-for="member in congressMembers"
+                            :key="member.name"
+                            :title="member.name"
+                            :sub-title="member.title"
+                            :img-src="member.photoUrl"
+                            img-alt="Image"
+                            img-top
+                            tag="article"
+                        >
+                            <v-card-title v-text="member.name"></v-card-title>
+                            <v-card-subtitle
+                                v-text="member.title"
+                                style="text-align:left"
+                            >
+                            </v-card-subtitle>
+                            <v-card-subtitle
+                                v-text="member.city"
+                                style="text-align:left"
+                            >
+                            </v-card-subtitle>
+                        </v-card>
+                    </div>
+                </div>
             </v-col>
             <v-col cols="6"><letter-display></letter-display></v-col>
         </v-row>
@@ -31,6 +56,7 @@
 
 <script lang="js">
 import LetterDisplay from '@/components/LetterDisplay.vue';
+import axios from 'axios';
 
   export default  {
     name: 'SearchReps',
@@ -43,23 +69,29 @@ import LetterDisplay from '@/components/LetterDisplay.vue';
     },
     data () {
       return {
-
+          congressMembers:[],
+	      hasContent: false,
+          search: "",
       }
     },
     methods: {
-        CreateRepList: function () {
-				this.congressMembers = [];
-				this.$http
-					.get(
-						"https://murmuring-headland-63935.herokuapp.com/api/amplify/" +
-							this.search
-					)
-
+        CheckInputContent: function () {
+				if (this.search != "") {
+					this.hasContent = true;
+				} else {
+					this.hasContent = false;
+				}
 			},
-
-    },
-    computed: {
-
+        async CreateRepList() {
+        try {
+            const res = await axios.get(
+                'https://murmuring-headland-63935.herokuapp.com/api/amplify/' + this.search
+            );
+            this.congressMembers = res.data;
+        } catch (e) {
+            console.error(e);
+        }
+    }
     }
 }
 </script>
